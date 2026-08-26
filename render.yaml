@@ -1,11 +1,18 @@
+# All three services live on Render so the whole platform needs a single
+# account and a single GitHub connection. DATABASE_URL points at Neon.
+# Region matches Neon's us-east-2 to keep database round-trips short.
+#
+# The cross-service URLs (API_URL, CORS_ORIGIN, APP_URL, API_PUBLIC_URL) are
+# sync:false because none of them are knowable until Render has assigned each
+# service its hostname. They get filled in right after the first deploy.
 services:
   - type: web
     name: muslim-tech-api
     runtime: node
     plan: free
-    region: frankfurt
+    region: ohio
     rootDir: apps/api
-    buildCommand: cd ../.. && pnpm install --frozen-lockfile && pnpm --filter @muslim-tech/types build && pnpm --filter @muslim-tech/api build
+    buildCommand: cd ../.. && npm install -g pnpm && pnpm install --frozen-lockfile && pnpm --filter @muslim-tech/types build && pnpm --filter @muslim-tech/api build
     startCommand: pnpm start:prod
     healthCheckPath: /health
     envVars:
@@ -30,4 +37,34 @@ services:
       - key: ADMIN_EMAIL
         sync: false
       - key: ADMIN_PASSWORD
+        sync: false
+
+  - type: web
+    name: muslim-tech-student
+    runtime: node
+    plan: free
+    region: ohio
+    rootDir: apps/student
+    buildCommand: cd ../.. && npm install -g pnpm && pnpm install --frozen-lockfile && pnpm --filter @muslim-tech/types build && pnpm --filter @muslim-tech/student build
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
+      # Server-side only: the browser never reaches the API directly, it goes
+      # through this app's own /api/proxy and /api/media routes.
+      - key: API_URL
+        sync: false
+
+  - type: web
+    name: muslim-tech-admin
+    runtime: node
+    plan: free
+    region: ohio
+    rootDir: apps/admin
+    buildCommand: cd ../.. && npm install -g pnpm && pnpm install --frozen-lockfile && pnpm --filter @muslim-tech/types build && pnpm --filter @muslim-tech/admin build
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
+      - key: API_URL
         sync: false

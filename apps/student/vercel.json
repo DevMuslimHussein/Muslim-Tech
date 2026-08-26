@@ -1,4 +1,0 @@
-{
-  "buildCommand": "cd ../.. && pnpm --filter @muslim-tech/types build && pnpm --filter @muslim-tech/student build",
-  "installCommand": "cd ../.. && pnpm install --frozen-lockfile"
-}
