@@ -11,6 +11,8 @@ import {
   IconSettings,
   IconNote,
   IconChat,
+  IconExam,
+  IconAward,
 } from "./icons";
 
 const UNREAD_POLL_MS = 20_000;
@@ -19,6 +21,8 @@ const links = [
   { href: "/", label: "الرئيسية", Icon: IconHome },
   { href: "/subjects", label: "المواد", Icon: IconBook },
   { href: "/notes", label: "ملاحظاتي", Icon: IconNote },
+  { href: "/exams", label: "الامتحانات", Icon: IconExam },
+  { href: "/grades", label: "درجاتي", Icon: IconAward },
   { href: "/bookmarks", label: "المحفوظات", Icon: IconLayers },
   { href: "/chat", label: "التواصل", Icon: IconChat, badge: "chat" as const },
   { href: "/announcements", label: "الإعلانات", Icon: IconMegaphone },

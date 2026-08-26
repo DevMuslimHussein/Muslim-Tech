@@ -200,3 +200,25 @@ export const IconEdit = (p: IconProps) => (
     <path d="M14.5 5.5l3 3" />
   </Base>
 );
+
+export const IconExam = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M15 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z" />
+    <path d="M14 3v5h5" />
+    <path d="m8.5 13.5 1.8 1.8 3.2-3.6" />
+  </Base>
+);
+
+export const IconAward = (p: IconProps) => (
+  <Base {...p}>
+    <circle cx="12" cy="9" r="5.5" />
+    <path d="m8.5 13.5-1 7.5 4.5-2.5 4.5 2.5-1-7.5" />
+  </Base>
+);
+
+export const IconClock = (p: IconProps) => (
+  <Base {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M12 7.5V12l3 1.8" />
+  </Base>
+);

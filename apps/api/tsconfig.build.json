@@ -5,7 +5,12 @@
     // infers the common source root — and because prisma/seed.ts sits outside
     // src/, that root becomes the package folder, emitting dist/src/main.js
     // and breaking `node dist/main` in production.
-    "rootDir": "./src"
+    "rootDir": "./src",
+    // nest-cli's deleteOutDir wipes dist/ but not the incremental cache, so a
+    // stale .tsbuildinfo makes tsc decide there is nothing to emit and the
+    // build "succeeds" while producing no output at all. Production builds are
+    // one-shot anyway, so drop the cache rather than keep the two in sync.
+    "incremental": false
   },
   "exclude": ["node_modules", "test", "dist", "prisma", "**/*spec.ts"]
 }

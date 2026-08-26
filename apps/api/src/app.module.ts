@@ -20,6 +20,8 @@ import { FilesModule } from './files/files.module';
 import { HomeModule } from './home/home.module';
 import { NotesModule } from './notes/notes.module';
 import { ChatModule } from './chat/chat.module';
+import { ExamsModule } from './exams/exams.module';
+import { GradesModule } from './grades/grades.module';
 
 @Module({
   imports: [
@@ -42,6 +44,8 @@ import { ChatModule } from './chat/chat.module';
     HomeModule,
     NotesModule,
     ChatModule,
+    ExamsModule,
+    GradesModule,
   ],
   controllers: [AppController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

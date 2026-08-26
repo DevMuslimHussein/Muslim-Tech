@@ -36,33 +36,48 @@ enum NotificationAudience {
   user
 }
 
-model User {
-  id           String    @id @default(cuid())
-  fullName     String    @map("full_name")
-  username     String    @unique
-  email        String    @unique
-  phone        String?
-  passwordHash String    @map("password_hash")
-  avatarUrl    String?   @map("avatar_url")
-  role         UserRole  @default(student)
-  status       UserStatus @default(active)
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
-  lastLoginAt  DateTime? @map("last_login_at")
+enum ExamStatus {
+  draft
+  published
+}
 
-  refreshTokens      RefreshToken[]
-  passwordResets     PasswordReset[]
-  notificationReads  NotificationRead[]
-  watchProgress      WatchProgress[]
-  bookmarks          Bookmark[]
-  notes              Note[]
-  conversation       Conversation?      @relation("StudentConversation")
-  sentMessages       Message[]          @relation("MessageSender")
-  auditLogs          AuditLog[]         @relation("AuditActor")
-  createdLectures    Lecture[]          @relation("LectureCreator")
-  createdAnnouncements Announcement[]   @relation("AnnouncementCreator")
-  createdNotifications Notification[]   @relation("NotificationCreator")
-  targetedNotifications Notification[]  @relation("NotificationTargetUser")
+enum QuestionType {
+  multiple_choice
+  true_false
+  short_answer
+}
+
+model User {
+  id           String     @id @default(cuid())
+  fullName     String     @map("full_name")
+  username     String     @unique
+  email        String     @unique
+  phone        String?
+  passwordHash String     @map("password_hash")
+  avatarUrl    String?    @map("avatar_url")
+  role         UserRole   @default(student)
+  status       UserStatus @default(active)
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  lastLoginAt  DateTime?  @map("last_login_at")
+
+  refreshTokens         RefreshToken[]
+  passwordResets        PasswordReset[]
+  notificationReads     NotificationRead[]
+  watchProgress         WatchProgress[]
+  bookmarks             Bookmark[]
+  notes                 Note[]
+  conversation          Conversation?      @relation("StudentConversation")
+  sentMessages          Message[]          @relation("MessageSender")
+  examAttempts          ExamAttempt[]
+  grades                GradeEntry[]       @relation("GradeStudent")
+  createdExams          Exam[]             @relation("ExamCreator")
+  recordedGrades        GradeEntry[]       @relation("GradeRecorder")
+  auditLogs             AuditLog[]         @relation("AuditActor")
+  createdLectures       Lecture[]          @relation("LectureCreator")
+  createdAnnouncements  Announcement[]     @relation("AnnouncementCreator")
+  createdNotifications  Notification[]     @relation("NotificationCreator")
+  targetedNotifications Notification[]     @relation("NotificationTargetUser")
 
   @@map("users")
 }
@@ -78,6 +93,8 @@ model Subject {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   chapters Chapter[]
+  exams    Exam[]
+  grades   GradeEntry[]
 
   @@map("subjects")
 }
@@ -91,6 +108,7 @@ model Chapter {
 
   subject  Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   lectures Lecture[]
+  exams    Exam[]
 
   @@index([subjectId])
   @@map("chapters")
@@ -162,16 +180,16 @@ model Announcement {
 }
 
 model Notification {
-  id             String               @id @default(cuid())
-  title          String
-  body           String
-  type           NotificationType
-  audience       NotificationAudience @default(all)
-  targetUserId   String?              @map("target_user_id")
-  deepLink       String?              @map("deep_link")
-  createdById    String?              @map("created_by")
-  scheduledAt    DateTime?            @map("scheduled_at")
-  createdAt      DateTime             @default(now()) @map("created_at")
+  id           String               @id @default(cuid())
+  title        String
+  body         String
+  type         NotificationType
+  audience     NotificationAudience @default(all)
+  targetUserId String?              @map("target_user_id")
+  deepLink     String?              @map("deep_link")
+  createdById  String?              @map("created_by")
+  scheduledAt  DateTime?            @map("scheduled_at")
+  createdAt    DateTime             @default(now()) @map("created_at")
 
   createdBy  User?              @relation("NotificationCreator", fields: [createdById], references: [id], onDelete: SetNull)
   targetUser User?              @relation("NotificationTargetUser", fields: [targetUserId], references: [id], onDelete: Cascade)
@@ -188,7 +206,7 @@ model NotificationRead {
   readAt         DateTime? @map("read_at")
 
   notification Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([notificationId, userId])
   @@index([userId, readAt])
@@ -249,13 +267,13 @@ model Note {
 /// One support thread per student. The administration side is shared: any admin
 /// can read and reply, so students always talk to "الإدارة" rather than a person.
 model Conversation {
-  id                String    @id @default(cuid())
-  studentId         String    @unique @map("student_id")
-  lastMessageAt     DateTime  @default(now()) @map("last_message_at")
+  id                 String   @id @default(cuid())
+  studentId          String   @unique @map("student_id")
+  lastMessageAt      DateTime @default(now()) @map("last_message_at")
   lastMessagePreview String?  @map("last_message_preview")
-  studentUnread     Int       @default(0) @map("student_unread")
-  adminUnread       Int       @default(0) @map("admin_unread")
-  createdAt         DateTime  @default(now()) @map("created_at")
+  studentUnread      Int      @default(0) @map("student_unread")
+  adminUnread        Int      @default(0) @map("admin_unread")
+  createdAt          DateTime @default(now()) @map("created_at")
 
   student  User      @relation("StudentConversation", fields: [studentId], references: [id], onDelete: Cascade)
   messages Message[]
@@ -277,6 +295,137 @@ model Message {
 
   @@index([conversationId, createdAt])
   @@map("messages")
+}
+
+model Exam {
+  id                     String     @id @default(cuid())
+  subjectId              String     @map("subject_id")
+  /// Optional narrower scope: an exam for one chapter rather than the subject.
+  chapterId              String?    @map("chapter_id")
+  title                  String
+  description            String?
+  /// null means untimed.
+  durationMinutes        Int?       @map("duration_minutes")
+  /// Percentage of total points needed to pass.
+  passMark               Int        @default(50) @map("pass_mark")
+  maxAttempts            Int        @default(1) @map("max_attempts")
+  shuffleQuestions       Boolean    @default(true) @map("shuffle_questions")
+  /// Whether a student sees their score right after submitting.
+  showResultsImmediately Boolean    @default(true) @map("show_results_immediately")
+  status                 ExamStatus @default(draft)
+  opensAt                DateTime?  @map("opens_at")
+  closesAt               DateTime?  @map("closes_at")
+  createdById            String?    @map("created_by")
+  createdAt              DateTime   @default(now()) @map("created_at")
+  updatedAt              DateTime   @updatedAt @map("updated_at")
+
+  subject   Subject       @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  chapter   Chapter?      @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+  createdBy User?         @relation("ExamCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  questions Question[]
+  attempts  ExamAttempt[]
+
+  @@index([subjectId])
+  @@index([status])
+  @@map("exams")
+}
+
+model Question {
+  id          String       @id @default(cuid())
+  examId      String       @map("exam_id")
+  type        QuestionType
+  text        String
+  points      Int          @default(1)
+  order       Int          @default(0)
+  /// Expected answer for short_answer questions; compared case-insensitively
+  /// as a first pass, with anything uncertain left for the admin to review.
+  correctText String?      @map("correct_text")
+
+  exam    Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  choices Choice[]
+  answers Answer[]
+
+  @@index([examId, order])
+  @@map("questions")
+}
+
+model Choice {
+  id         String  @id @default(cuid())
+  questionId String  @map("question_id")
+  text       String
+  isCorrect  Boolean @default(false) @map("is_correct")
+  order      Int     @default(0)
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answers  Answer[]
+
+  @@index([questionId, order])
+  @@map("choices")
+}
+
+model ExamAttempt {
+  id           String    @id @default(cuid())
+  examId       String    @map("exam_id")
+  userId       String    @map("user_id")
+  startedAt    DateTime  @default(now()) @map("started_at")
+  submittedAt  DateTime? @map("submitted_at")
+  /// Percentage, 0-100. Null until submitted.
+  score        Float?
+  earnedPoints Float?    @map("earned_points")
+  totalPoints  Int?      @map("total_points")
+  /// True while the attempt contains short answers the admin has not graded.
+  needsReview  Boolean   @default(false) @map("needs_review")
+
+  exam    Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answers Answer[]
+
+  @@index([examId, userId])
+  @@index([userId, submittedAt])
+  @@map("exam_attempts")
+}
+
+model Answer {
+  id           String   @id @default(cuid())
+  attemptId    String   @map("attempt_id")
+  questionId   String   @map("question_id")
+  /// Set for multiple_choice and true_false.
+  choiceId     String?  @map("choice_id")
+  /// Set for short_answer.
+  text         String?
+  /// Null means "not graded yet" — only possible for short answers.
+  isCorrect    Boolean? @map("is_correct")
+  earnedPoints Float?   @map("earned_points")
+
+  attempt  ExamAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  choice   Choice?     @relation(fields: [choiceId], references: [id], onDelete: SetNull)
+
+  @@unique([attemptId, questionId])
+  @@index([attemptId])
+  @@map("answers")
+}
+
+/// A mark the admin enters by hand — participation, homework, attendance —
+/// alongside the marks that come automatically from exams.
+model GradeEntry {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  subjectId   String   @map("subject_id")
+  title       String
+  points      Float
+  maxPoints   Float    @map("max_points")
+  note        String?
+  createdById String?  @map("created_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user      User    @relation("GradeStudent", fields: [userId], references: [id], onDelete: Cascade)
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  createdBy User?   @relation("GradeRecorder", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([userId, subjectId])
+  @@index([subjectId])
+  @@map("grade_entries")
 }
 
 model RefreshToken {
@@ -310,14 +459,14 @@ model PasswordReset {
 }
 
 model AppRelease {
-  id           String   @id @default(cuid())
-  platform     String
-  version      String
-  notes        String?
-  downloadUrl  String   @map("download_url")
-  signature    String
-  isMandatory  Boolean  @default(false) @map("is_mandatory")
-  releasedAt   DateTime @default(now()) @map("released_at")
+  id          String   @id @default(cuid())
+  platform    String
+  version     String
+  notes       String?
+  downloadUrl String   @map("download_url")
+  signature   String
+  isMandatory Boolean  @default(false) @map("is_mandatory")
+  releasedAt  DateTime @default(now()) @map("released_at")
 
   @@unique([platform, version])
   @@index([platform, releasedAt])
