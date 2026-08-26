@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const ACCESS_COOKIE = "mt_access";
+import { ACCESS_COOKIE } from "@/lib/cookies";
 const PUBLIC_PATHS = ["/login", "/signup", "/forgot-password", "/reset-password"];
 
 export function proxy(request: NextRequest) {

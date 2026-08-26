@@ -1,17 +1,18 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { serverApiFetch } from "@/lib/server-api";
-import { Card, Badge } from "@/components/ui";
-import { IconFile, IconChevronLeft } from "@/components/icons";
+import { Badge } from "@/components/ui";
+import { IconChevronLeft } from "@/components/icons";
 import { VideoPlayer } from "./video-player";
 import { BookmarkButton } from "./bookmark-button";
+import { FileViewer } from "./file-viewer";
+import { LectureNotes } from "./lecture-notes";
 
 interface LectureFile {
   id: string;
   fileName: string;
   fileType: string;
   fileSize: number;
-  isDownloadable: boolean;
 }
 
 interface Lecture {
@@ -22,12 +23,6 @@ interface Lecture {
   videoAssetId: string | null;
   files: LectureFile[];
   chapter: { id: string; title: string; subject: { id: string; name: string } };
-}
-
-function formatSize(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 export default async function LecturePage({
@@ -75,30 +70,11 @@ export default async function LecturePage({
       {lecture.files.length > 0 && (
         <div className="mt-8">
           <h2 className="mb-3 text-sm font-semibold text-ink">ملفات المحاضرة</h2>
-          <Card className="overflow-hidden">
-            {lecture.files.map((file) => (
-              <a
-                key={file.id}
-                href={`/api/media/files/${file.id}`}
-                className="flex items-center gap-3 border-b border-border px-4 py-3 text-sm transition-colors last:border-0 hover:bg-surface-2"
-              >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-surface-2 text-muted">
-                  <IconFile width={15} height={15} />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-ink">{file.fileName}</span>
-                  <span className="font-mono text-xs tabular-nums text-muted">
-                    {formatSize(file.fileSize)}
-                  </span>
-                </span>
-                <span className="shrink-0 text-xs text-accent-ink">
-                  {file.isDownloadable ? "تحميل" : "عرض"}
-                </span>
-              </a>
-            ))}
-          </Card>
+          <FileViewer files={lecture.files} />
         </div>
       )}
+
+      <LectureNotes lectureId={lecture.id} />
     </div>
   );
 }

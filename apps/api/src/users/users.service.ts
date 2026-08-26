@@ -106,9 +106,23 @@ export class UsersService {
       this.audit.record(actorId ?? null, action, 'user', id, {
         fullName: updated.fullName,
       });
+
+      // Suspension has to end the student's live sessions, not just block the
+      // next login — otherwise their open tab keeps working off its refresh
+      // token until it expires days later.
+      if (dto.status === 'suspended') {
+        await this.revokeAllSessions(id);
+      }
     }
 
     return updated;
+  }
+
+  private async revokeAllSessions(userId: string) {
+    await this.prisma.refreshToken.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
   }
 
   async removeStudent(id: string, actorId?: string) {

@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { apiUrl } from "@/lib/api";
 
-const ACCESS_COOKIE = "mt_access";
-const REFRESH_COOKIE = "mt_refresh";
+import { ACCESS_COOKIE, REFRESH_COOKIE } from "@/lib/cookies";
 
 async function setSessionCookies(accessToken: string, refreshToken: string) {
   const cookieStore = await cookies();

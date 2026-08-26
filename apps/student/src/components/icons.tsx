@@ -145,3 +145,58 @@ export const IconLayers = (p: IconProps) => (
     <path d="m3 13 9 5 9-5" />
   </Base>
 );
+
+export const IconNote = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M15 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z" />
+    <path d="M14 3v5h5" />
+    <path d="M8.5 12.5h7M8.5 16h4.5" />
+  </Base>
+);
+
+export const IconChat = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M21 11.5a7.5 7.5 0 0 1-10.9 6.7L4 20l1.8-5.1A7.5 7.5 0 1 1 21 11.5z" />
+  </Base>
+);
+
+export const IconSend = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M21 3 10.5 13.5" />
+    <path d="M21 3 14.5 21l-4-7.5L3 9.5z" />
+  </Base>
+);
+
+export const IconEye = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
+    <circle cx="12" cy="12" r="2.8" />
+  </Base>
+);
+
+export const IconClose = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M6 6l12 12M18 6 6 18" />
+  </Base>
+);
+
+export const IconLock = (p: IconProps) => (
+  <Base {...p}>
+    <rect x="4.5" y="10.5" width="15" height="10" rx="1.5" />
+    <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
+  </Base>
+);
+
+export const IconPin = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M9 3h6l-1 6 3.5 3.5H6.5L10 9z" />
+    <path d="M12 12.5V21" />
+  </Base>
+);
+
+export const IconEdit = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17z" />
+    <path d="M14.5 5.5l3 3" />
+  </Base>
+);

@@ -46,6 +46,11 @@ export class LecturesController {
     }
 
     const contentType = guessVideoContentType(fullPath);
+    // Streamed for in-app playback only: never offered as a download, and kept
+    // out of the disk cache so it can't be lifted from the browser's cache dir.
+    res.setHeader('Content-Disposition', 'inline');
+    res.setHeader('Cache-Control', 'private, no-store, max-age=0');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
 
     if (!range) {
       res.writeHead(200, {

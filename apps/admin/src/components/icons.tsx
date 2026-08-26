@@ -152,3 +152,16 @@ export const IconLayers = (p: IconProps) => (
     <path d="m3 13 9 5 9-5" />
   </Base>
 );
+
+export const IconChat = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M21 11.5a7.5 7.5 0 0 1-10.9 6.7L4 20l1.8-5.1A7.5 7.5 0 1 1 21 11.5z" />
+  </Base>
+);
+
+export const IconSend = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M21 3 10.5 13.5" />
+    <path d="M21 3 14.5 21l-4-7.5L3 9.5z" />
+  </Base>
+);

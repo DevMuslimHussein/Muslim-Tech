@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { apiUrl } from "@/lib/api";
+import { ACCESS_COOKIE } from "@/lib/cookies";
 
 async function forward(request: Request, path: string[]) {
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get("mt_access")?.value;
+  const accessToken = cookieStore.get(ACCESS_COOKIE)?.value;
 
   if (!accessToken) {
     return NextResponse.json({ message: "غير مصرح" }, { status: 401 });

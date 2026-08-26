@@ -55,6 +55,9 @@ model User {
   notificationReads  NotificationRead[]
   watchProgress      WatchProgress[]
   bookmarks          Bookmark[]
+  notes              Note[]
+  conversation       Conversation?      @relation("StudentConversation")
+  sentMessages       Message[]          @relation("MessageSender")
   auditLogs          AuditLog[]         @relation("AuditActor")
   createdLectures    Lecture[]          @relation("LectureCreator")
   createdAnnouncements Announcement[]   @relation("AnnouncementCreator")
@@ -112,6 +115,7 @@ model Lecture {
   files         LectureFile[]
   watchProgress WatchProgress[]
   bookmarks     Bookmark[]
+  notes         Note[]
 
   @@index([chapterId])
   @@index([status, publishAt])
@@ -216,6 +220,60 @@ model Bookmark {
   @@unique([userId, lectureId])
   @@index([userId, createdAt])
   @@map("bookmarks")
+}
+
+/// A student's private note. Optionally pinned to the lecture it was taken on,
+/// so the lecture page can show just that lecture's notes alongside the video.
+model Note {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  lectureId String?  @map("lecture_id")
+  title     String
+  content   String
+  color     String   @default("default")
+  isPinned  Boolean  @default(false) @map("is_pinned")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lecture Lecture? @relation(fields: [lectureId], references: [id], onDelete: SetNull)
+
+  @@index([userId, updatedAt])
+  @@index([userId, lectureId])
+  @@map("notes")
+}
+
+/// One support thread per student. The administration side is shared: any admin
+/// can read and reply, so students always talk to "الإدارة" rather than a person.
+model Conversation {
+  id                String    @id @default(cuid())
+  studentId         String    @unique @map("student_id")
+  lastMessageAt     DateTime  @default(now()) @map("last_message_at")
+  lastMessagePreview String?  @map("last_message_preview")
+  studentUnread     Int       @default(0) @map("student_unread")
+  adminUnread       Int       @default(0) @map("admin_unread")
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  student  User      @relation("StudentConversation", fields: [studentId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@index([lastMessageAt])
+  @@map("conversations")
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String   @map("conversation_id")
+  senderId       String?  @map("sender_id")
+  fromAdmin      Boolean  @map("from_admin")
+  body           String
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User?        @relation("MessageSender", fields: [senderId], references: [id], onDelete: SetNull)
+
+  @@index([conversationId, createdAt])
+  @@map("messages")
 }
 
 model RefreshToken {

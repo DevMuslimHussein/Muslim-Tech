@@ -1,10 +1,11 @@
 import { cookies } from "next/headers";
 import { apiUrl } from "@/lib/api";
+import { ACCESS_COOKIE } from "@/lib/cookies";
 
 export async function GET(request: Request, { params }: { params: Promise<{ path: string[] }> }) {
   const { path } = await params;
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get("mt_access")?.value;
+  const accessToken = cookieStore.get(ACCESS_COOKIE)?.value;
 
   if (!accessToken) {
     return new Response(JSON.stringify({ message: "غير مصرح" }), {
@@ -28,7 +29,17 @@ export async function GET(request: Request, { params }: { params: Promise<{ path
   }
 
   const responseHeaders = new Headers();
-  for (const key of ["content-type", "content-length", "content-range", "accept-ranges", "content-disposition"]) {
+  for (const key of [
+    "content-type",
+    "content-length",
+    "content-range",
+    "accept-ranges",
+    "content-disposition",
+    // Forwarded so the API's no-store policy actually reaches the browser —
+    // otherwise course material lands in the on-disk HTTP cache.
+    "cache-control",
+    "x-content-type-options",
+  ]) {
     const value = upstream.headers.get(key);
     if (value) responseHeaders.set(key, value);
   }

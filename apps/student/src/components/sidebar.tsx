@@ -2,18 +2,50 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { IconHome, IconBook, IconMegaphone, IconLayers, IconSettings } from "./icons";
+import { useEffect, useState } from "react";
+import {
+  IconHome,
+  IconBook,
+  IconMegaphone,
+  IconLayers,
+  IconSettings,
+  IconNote,
+  IconChat,
+} from "./icons";
+
+const UNREAD_POLL_MS = 20_000;
 
 const links = [
   { href: "/", label: "الرئيسية", Icon: IconHome },
   { href: "/subjects", label: "المواد", Icon: IconBook },
+  { href: "/notes", label: "ملاحظاتي", Icon: IconNote },
   { href: "/bookmarks", label: "المحفوظات", Icon: IconLayers },
+  { href: "/chat", label: "التواصل", Icon: IconChat, badge: "chat" as const },
   { href: "/announcements", label: "الإعلانات", Icon: IconMegaphone },
   { href: "/settings", label: "حسابي", Icon: IconSettings },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
+  const [chatUnread, setChatUnread] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function check() {
+      const response = await fetch("/api/proxy/chat/unread").catch(() => null);
+      if (cancelled || !response?.ok) return;
+      const data = (await response.json()) as { unread: number };
+      setChatUnread(data.unread);
+    }
+
+    void check();
+    const timer = setInterval(check, UNREAD_POLL_MS);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [pathname]);
 
   return (
     <aside className="flex w-60 shrink-0 flex-col border-l border-border bg-bg-elevated px-3 py-5">
@@ -28,8 +60,9 @@ export function Sidebar() {
       </div>
 
       <nav className="flex flex-col gap-0.5">
-        {links.map(({ href, label, Icon }) => {
+        {links.map(({ href, label, Icon, badge }) => {
           const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
+          const count = badge === "chat" ? chatUnread : 0;
           return (
             <Link
               key={href}
@@ -45,7 +78,12 @@ export function Sidebar() {
                 height={18}
                 className={isActive ? "text-accent" : "text-muted group-hover:text-ink-soft"}
               />
-              {label}
+              <span className="flex-1">{label}</span>
+              {count > 0 && (
+                <span className="flex min-w-5 items-center justify-center rounded-full bg-danger px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-white">
+                  {count > 99 ? "99+" : count}
+                </span>
+              )}
             </Link>
           );
         })}

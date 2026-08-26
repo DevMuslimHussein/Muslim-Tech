@@ -18,6 +18,8 @@ import { ProgressModule } from './progress/progress.module';
 import { StatsModule } from './stats/stats.module';
 import { FilesModule } from './files/files.module';
 import { HomeModule } from './home/home.module';
+import { NotesModule } from './notes/notes.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { HomeModule } from './home/home.module';
     StatsModule,
     FilesModule,
     HomeModule,
+    NotesModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

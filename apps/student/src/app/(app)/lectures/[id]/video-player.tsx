@@ -74,6 +74,13 @@ export function VideoPlayer({ lectureId, src }: { lectureId: string; src: string
         onLoadedMetadata={handleLoadedMetadata}
         onPause={save}
         onEnded={save}
+        // Removes the browser's built-in download/PiP escape hatches and the
+        // right-click "save video as" menu. Deterrence, not DRM — a determined
+        // student can still capture the screen.
+        controlsList="nodownload noplaybackrate noremoteplayback"
+        disablePictureInPicture
+        disableRemotePlayback
+        onContextMenu={(event) => event.preventDefault()}
         className="w-full rounded-lg border border-border bg-black shadow-md"
         src={src}
       />

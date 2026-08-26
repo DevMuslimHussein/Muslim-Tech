@@ -1,9 +1,17 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Card, PageHeader, Badge, EmptyState, Skeleton, Input } from "@/components/ui";
 import { Avatar } from "@/components/avatar";
-import { IconUsers, IconSearch, IconCheck, IconBan, IconTrash } from "@/components/icons";
+import {
+  IconUsers,
+  IconSearch,
+  IconCheck,
+  IconBan,
+  IconTrash,
+  IconChat,
+} from "@/components/icons";
 
 interface Student {
   id: string;
@@ -22,6 +30,7 @@ interface StudentsResponse {
 }
 
 export function StudentsTable() {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [data, setData] = useState<StudentsResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,6 +63,11 @@ export function StudentsTable() {
     if (!confirm(`حذف حساب "${student.fullName}" نهائيًا؟`)) return;
     await fetch(`/api/proxy/admin/students/${student.id}`, { method: "DELETE" });
     load(search);
+  }
+
+  async function openChat(student: Student) {
+    await fetch(`/api/proxy/admin/chat/with/${student.id}`, { method: "POST" });
+    router.push("/chat");
   }
 
   return (
@@ -131,6 +145,15 @@ export function StudentsTable() {
                     </td>
                     <td className="px-5 py-3 text-left whitespace-nowrap">
                       <div className="inline-flex items-center gap-1.5">
+                        <button
+                          onClick={() => openChat(student)}
+                          title="مراسلة الطالب"
+                          aria-label="مراسلة الطالب"
+                          className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs text-ink-soft transition-colors hover:border-accent hover:bg-accent-soft hover:text-accent-ink"
+                        >
+                          <IconChat width={14} height={14} />
+                          مراسلة
+                        </button>
                         {student.status === "active" ? (
                           <button
                             onClick={() => toggleStatus(student)}

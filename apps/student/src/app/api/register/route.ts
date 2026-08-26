@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { apiUrl } from "@/lib/api";
+import { ACCESS_COOKIE, REFRESH_COOKIE } from "@/lib/cookies";
 
 export async function POST(request: Request) {
   const { fullName, username, email, password } = (await request.json()) as {
@@ -39,14 +40,14 @@ export async function POST(request: Request) {
   };
 
   const cookieStore = await cookies();
-  cookieStore.set("mt_access", accessToken, {
+  cookieStore.set(ACCESS_COOKIE, accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
     maxAge: 15 * 60,
   });
-  cookieStore.set("mt_refresh", refreshToken, {
+  cookieStore.set(REFRESH_COOKIE, refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
