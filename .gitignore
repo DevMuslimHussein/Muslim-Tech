@@ -25,3 +25,5 @@ apps/api/storage/public/*
 apps/api/storage/protected/*
 !apps/api/storage/public/.gitkeep
 !apps/api/storage/protected/.gitkeep
+
+*.tsbuildinfo
