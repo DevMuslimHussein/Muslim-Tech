@@ -1,0 +1,19 @@
+{
+  "name": "@muslim-tech/ui",
+  "private": true,
+  "version": "0.1.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./tokens.css": "./src/tokens.css",
+    "./theme.css": "./src/theme.css"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}

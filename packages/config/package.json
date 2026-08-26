@@ -1,0 +1,9 @@
+{
+  "name": "@muslim-tech/config",
+  "private": true,
+  "version": "0.1.0",
+  "files": [
+    "tsconfig.base.json",
+    "eslint.base.js"
+  ]
+}

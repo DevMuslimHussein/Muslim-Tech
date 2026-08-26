@@ -1,0 +1,21 @@
+{
+  "name": "muslim-tech",
+  "private": true,
+  "version": "0.1.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:api": "pnpm --filter @muslim-tech/api dev",
+    "dev:admin": "pnpm --filter @muslim-tech/admin dev",
+    "dev:student": "pnpm --filter @muslim-tech/student dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "packageManager": "pnpm@11.23.0"
+}

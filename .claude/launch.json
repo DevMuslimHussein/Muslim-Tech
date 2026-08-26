@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "muslim-tech-admin",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@muslim-tech/admin", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "muslim-tech-api",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@muslim-tech/api", "dev"],
+      "port": 4000
+    },
+    {
+      "name": "muslim-tech-student",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@muslim-tech/student", "dev"],
+      "port": 3001
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+/*
+  Tailwind v4 theme mapping for Muslim Tech.
+  Import after tailwindcss and tokens.css in each app's globals.css.
+*/
+
+@theme inline {
+  --color-bg: var(--mt-bg);
+  --color-bg-elevated: var(--mt-bg-elevated);
+  --color-surface: var(--mt-surface);
+  --color-surface-2: var(--mt-surface-2);
+  --color-surface-3: var(--mt-surface-3);
+  --color-border: var(--mt-border);
+  --color-border-strong: var(--mt-border-strong);
+
+  --color-ink: var(--mt-ink);
+  --color-ink-soft: var(--mt-ink-soft);
+  --color-muted: var(--mt-muted);
+
+  --color-accent: var(--mt-accent);
+  --color-accent-hover: var(--mt-accent-hover);
+  --color-accent-ink: var(--mt-accent-ink);
+  --color-accent-soft: var(--mt-accent-soft);
+  --color-accent-soft-border: var(--mt-accent-soft-border);
+  --color-accent-contrast: var(--mt-accent-contrast);
+
+  --color-violet: var(--mt-violet);
+  --color-violet-soft: var(--mt-violet-soft);
+  --color-violet-ink: var(--mt-violet-ink);
+
+  --color-success: var(--mt-success);
+  --color-success-soft: var(--mt-success-soft);
+  --color-warning: var(--mt-warning);
+  --color-warning-soft: var(--mt-warning-soft);
+  --color-danger: var(--mt-danger);
+  --color-danger-soft: var(--mt-danger-soft);
+  --color-info: var(--mt-info);
+  --color-info-soft: var(--mt-info-soft);
+
+  --font-ar: var(--font-ibm-plex-sans-arabic), "Segoe UI", Tahoma, sans-serif;
+  --font-en: var(--font-ibm-plex-sans), system-ui, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
+
+  --radius-sm: var(--mt-radius-sm);
+  --radius-md: var(--mt-radius-md);
+  --radius-lg: var(--mt-radius-lg);
+  --radius-xl: var(--mt-radius-xl);
+
+  --shadow-sm: var(--mt-shadow-sm);
+  --shadow-md: var(--mt-shadow-md);
+  --shadow-lg: var(--mt-shadow-lg);
+  --shadow-accent: var(--mt-shadow-accent);
+
+  --ease-mt: var(--mt-motion-ease);
+  --ease-spring: var(--mt-motion-spring);
+}
+
+@utility bg-gradient-brand {
+  background-image: var(--mt-gradient-brand);
+}
+
+@utility bg-gradient-violet {
+  background-image: var(--mt-gradient-violet);
+}
