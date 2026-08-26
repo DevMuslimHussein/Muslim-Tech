@@ -9,6 +9,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { AuditService } from '../audit/audit.service';
 import type { CreateLectureDto } from './dto/create-lecture.dto';
 import type { UpdateLectureDto } from './dto/update-lecture.dto';
+import { extractYoutubeId } from './youtube.js';
 
 @Injectable()
 export class LecturesService {
@@ -73,19 +74,35 @@ export class LecturesService {
         number: dto.number,
         status: dto.status ?? 'draft',
         publishAt: dto.publishAt ? new Date(dto.publishAt) : undefined,
+        youtubeId: dto.youtubeUrl
+          ? this.parseYoutube(dto.youtubeUrl)
+          : undefined,
       },
     });
   }
 
   async update(id: string, dto: UpdateLectureDto) {
     await this.findByIdForAdmin(id);
+    const { youtubeUrl, ...rest } = dto;
     return this.prisma.lecture.update({
       where: { id },
       data: {
-        ...dto,
+        ...rest,
         publishAt: dto.publishAt ? new Date(dto.publishAt) : undefined,
+        // An empty string is how the admin form clears the link.
+        ...(youtubeUrl !== undefined
+          ? { youtubeId: youtubeUrl.trim() ? this.parseYoutube(youtubeUrl) : null }
+          : {}),
       },
     });
+  }
+
+  private parseYoutube(input: string): string {
+    const id = extractYoutubeId(input);
+    if (!id) {
+      throw new BadRequestException('رابط يوتيوب غير صالح');
+    }
+    return id;
   }
 
   async publish(id: string, actorId?: string) {

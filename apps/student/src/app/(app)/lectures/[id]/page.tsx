@@ -4,6 +4,7 @@ import { serverApiFetch } from "@/lib/server-api";
 import { Badge } from "@/components/ui";
 import { IconChevronLeft } from "@/components/icons";
 import { VideoPlayer } from "./video-player";
+import { YoutubePlayer } from "./youtube-player";
 import { BookmarkButton } from "./bookmark-button";
 import { FileViewer } from "./file-viewer";
 import { LectureNotes } from "./lecture-notes";
@@ -21,6 +22,7 @@ interface Lecture {
   description: string | null;
   number: number;
   videoAssetId: string | null;
+  youtubeId: string | null;
   files: LectureFile[];
   chapter: { id: string; title: string; subject: { id: string; name: string } };
 }
@@ -47,7 +49,9 @@ export default async function LecturePage({
         {lecture.chapter.subject.name}
       </Link>
 
-      {lecture.videoAssetId ? (
+      {lecture.youtubeId ? (
+        <YoutubePlayer lectureId={lecture.id} youtubeId={lecture.youtubeId} />
+      ) : lecture.videoAssetId ? (
         <VideoPlayer lectureId={lecture.id} src={`/api/media/lectures/${lecture.id}/video`} />
       ) : (
         <div className="flex h-52 items-center justify-center rounded-lg border border-dashed border-border bg-surface-2 text-sm text-muted">

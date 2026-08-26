@@ -18,6 +18,7 @@ interface Lecture {
   status: "draft" | "scheduled" | "published";
   thumbnailUrl: string | null;
   videoAssetId: string | null;
+  youtubeId: string | null;
   files: LectureFile[];
 }
 
@@ -125,7 +126,9 @@ export function LectureRow({
         <button onClick={() => setIsOpen((v) => !v)} className="flex min-w-0 flex-1 items-center gap-3 text-right">
           <span
             className={`flex size-8 shrink-0 items-center justify-center rounded-md ${
-              lecture.videoAssetId ? "bg-accent-soft text-accent" : "bg-surface-2 text-muted"
+              lecture.youtubeId || lecture.videoAssetId
+                ? "bg-accent-soft text-accent"
+                : "bg-surface-2 text-muted"
             }`}
           >
             <IconPlay width={15} height={15} />
@@ -136,7 +139,11 @@ export function LectureRow({
             </span>
             <span className="mt-0.5 block text-xs text-muted">
               {lecture.files.length > 0 ? `${lecture.files.length} ملف` : "بدون ملفات"}
-              {lecture.videoAssetId ? " · فيديو مرفوع" : ""}
+              {lecture.youtubeId
+                ? " · يوتيوب"
+                : lecture.videoAssetId
+                  ? " · فيديو مرفوع"
+                  : ""}
             </span>
           </span>
         </button>
@@ -215,7 +222,8 @@ export function LectureRow({
 
             <div>
               <p className="mb-2 text-xs font-medium text-ink-soft">
-                الفيديو (MP4) {lecture.videoAssetId && <span className="text-success">· مرفوع</span>}
+                رفع فيديو (MP4){" "}
+                {lecture.videoAssetId && <span className="text-success">· مرفوع</span>}
               </p>
               <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-border bg-surface px-3 py-1.5 text-xs text-ink-soft transition-colors hover:border-accent hover:text-accent-ink">
                 <IconUpload width={14} height={14} />
@@ -227,8 +235,13 @@ export function LectureRow({
                   onChange={(e) => e.target.files?.[0] && upload("video", e.target.files[0])}
                 />
               </label>
+              <p className="mt-1.5 text-[11px] text-warning">
+                ⚠ الملفات المرفوعة تُمسح عند إعادة تشغيل الخادم
+              </p>
             </div>
           </div>
+
+          <YoutubeField lecture={lecture} onChanged={onChanged} />
 
           <div>
             <p className="mb-2 text-xs font-medium text-ink-soft">الملفات الملحقة</p>
@@ -263,6 +276,79 @@ export function LectureRow({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * YouTube is the recommended way to attach a lecture video: it costs nothing,
+ * has no size limit, and — unlike uploads on the free hosting tier — survives
+ * server restarts.
+ */
+function YoutubeField({
+  lecture,
+  onChanged,
+}: {
+  lecture: Lecture;
+  onChanged: () => void;
+}) {
+  const [value, setValue] = useState(
+    lecture.youtubeId ? `https://youtu.be/${lecture.youtubeId}` : "",
+  );
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function save() {
+    setIsSaving(true);
+    setError(null);
+    const response = await fetch(`/api/proxy/admin/lectures/${lecture.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ youtubeUrl: value.trim() }),
+    });
+    setIsSaving(false);
+    if (!response.ok) {
+      const body = (await response.json().catch(() => null)) as { message?: string } | null;
+      setError(body?.message ?? "تعذّر الحفظ");
+      return;
+    }
+    onChanged();
+  }
+
+  return (
+    <div className="rounded-lg border border-accent/30 bg-accent-soft/30 p-3">
+      <p className="mb-2 flex items-center gap-1.5 text-xs font-medium text-ink">
+        رابط يوتيوب
+        <span className="rounded bg-success-soft px-1.5 py-0.5 text-[10px] text-success">
+          موصى به · مجاني ودائم
+        </span>
+        {lecture.youtubeId && <span className="text-success">· مضبوط</span>}
+      </p>
+
+      <div className="flex gap-2">
+        <input
+          type="url"
+          dir="ltr"
+          placeholder="https://youtu.be/..."
+          value={value}
+          onChange={(event) => setValue(event.target.value)}
+          className="min-w-0 flex-1 rounded-md border border-border bg-surface px-3 py-1.5 font-en text-xs text-ink outline-none transition-colors placeholder:text-muted focus:border-accent"
+        />
+        <button
+          onClick={save}
+          disabled={isSaving}
+          className="shrink-0 rounded-md bg-accent px-3 py-1.5 text-xs font-medium text-accent-contrast transition-opacity hover:opacity-90 disabled:opacity-55"
+        >
+          {isSaving ? "..." : "حفظ"}
+        </button>
+      </div>
+
+      {error && <p className="mt-1.5 text-[11px] text-danger">{error}</p>}
+
+      <p className="mt-1.5 text-[11px] text-muted">
+        ارفع المحاضرة على يوتيوب واختر «غير مدرج» (Unlisted)، ثم الصق الرابط هنا.
+        سيُعرض داخل التطبيق مباشرة.
+      </p>
     </div>
   );
 }

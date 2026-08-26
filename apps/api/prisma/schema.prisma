@@ -103,6 +103,9 @@ model Lecture {
   description  String?
   thumbnailUrl String?       @map("thumbnail_url")
   videoAssetId String?       @map("video_asset_id")
+  /// YouTube video id for lectures hosted on YouTube rather than uploaded.
+  /// Free and unlimited, and unlike uploads it survives server restarts.
+  youtubeId    String?       @map("youtube_id")
   number       Int
   status       LectureStatus @default(draft)
   publishAt    DateTime?     @map("publish_at")

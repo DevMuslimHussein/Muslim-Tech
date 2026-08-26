@@ -14,6 +14,7 @@ interface Lecture {
   status: "draft" | "scheduled" | "published";
   thumbnailUrl: string | null;
   videoAssetId: string | null;
+  youtubeId: string | null;
   files: { id: string; fileName: string; isDownloadable: boolean }[];
 }
 

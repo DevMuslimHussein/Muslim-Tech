@@ -33,4 +33,10 @@ export class CreateLectureDto {
   @IsOptional()
   @IsISO8601()
   publishAt?: string;
+
+  /** A YouTube URL in any shape, or a bare video id. Empty string clears it. */
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  youtubeUrl?: string;
 }
