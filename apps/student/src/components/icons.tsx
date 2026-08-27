@@ -222,3 +222,9 @@ export const IconClock = (p: IconProps) => (
     <path d="M12 7.5V12l3 1.8" />
   </Base>
 );
+
+export const IconCode = (p: IconProps) => (
+  <Base {...p}>
+    <path d="m9 8-5 4 5 4M15 8l5 4-5 4" />
+  </Base>
+);
