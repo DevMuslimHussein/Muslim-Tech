@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { serverApiFetch } from "@/lib/server-api";
-import { Card, Badge, EmptyState, ProgressBar } from "@/components/ui";
+import { Card, Badge, EmptyState, ProgressBar, ProgressRing } from "@/components/ui";
 import { IconPlay, IconBook, IconMegaphone } from "@/components/icons";
 
 interface Lecture {
@@ -60,19 +60,31 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-9">
-      <section className="overflow-hidden rounded-xl bg-gradient-brand p-7 text-white shadow-accent">
-        <p className="text-sm/relaxed opacity-90">تقدّمك الإجمالي</p>
-        <p className="mt-1 font-mono text-4xl font-semibold tabular-nums">{overallPercent}%</p>
-        <div className="mt-4 h-1.5 w-full max-w-md overflow-hidden rounded-full bg-white/25">
-          <div
-            className="h-full rounded-full bg-white transition-[width] duration-700 ease-mt"
-            style={{ width: `${overallPercent}%` }}
-          />
+      <section className="relative flex items-center justify-between gap-6 overflow-hidden rounded-2xl bg-gradient-brand p-5 text-white shadow-accent sm:p-7">
+        {/* Soft highlight so the flat gradient reads as a lit surface. */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -top-16 -left-12 size-56 rounded-full bg-white/10"
+        />
+        <div className="relative min-w-0">
+          <p className="text-sm/relaxed opacity-90">تقدّمك الإجمالي</p>
+          <p className="mt-1 font-mono text-4xl font-semibold tracking-tight tabular-nums sm:text-5xl">
+            {overallPercent}%
+          </p>
+          <p className="mt-2 text-sm opacity-90">
+            {summary.subjects.reduce((sum, s) => sum + s.progress.completed, 0)} محاضرة مكتملة من{" "}
+            {summary.subjects.reduce((sum, s) => sum + s.progress.total, 0)}
+          </p>
+          <div className="mt-4 h-1.5 w-full max-w-md overflow-hidden rounded-full bg-white/25">
+            <div
+              className="h-full rounded-full bg-white transition-[width] duration-700 ease-mt"
+              style={{ width: `${overallPercent}%` }}
+            />
+          </div>
         </div>
-        <p className="mt-3 text-sm opacity-90">
-          {summary.subjects.reduce((sum, s) => sum + s.progress.completed, 0)} محاضرة مكتملة من{" "}
-          {summary.subjects.reduce((sum, s) => sum + s.progress.total, 0)}
-        </p>
+        {/* Hidden on the narrowest screens: the bar above already carries
+            the same number, and the ring would squeeze the text column. */}
+        <ProgressRing percent={overallPercent} className="hidden sm:block" />
       </section>
 
       {summary.continueWatching.length > 0 && (
@@ -157,20 +169,19 @@ export default async function HomePage() {
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {summary.subjects.map((subject) => (
               <Link key={subject.id} href={`/subjects/${subject.id}`}>
-                <Card hover className="h-full p-5">
-                  <span className="mb-3 flex size-10 items-center justify-center rounded-md bg-violet-soft text-violet">
-                    <IconBook width={19} height={19} />
-                  </span>
-                  <p className="font-medium text-ink">{subject.name}</p>
-                  <p className="mt-1 text-xs text-muted">{subject.lectureCount} محاضرة</p>
-                  <div className="mt-4">
-                    <div className="mb-1.5 flex items-center justify-between">
-                      <span className="text-xs text-ink-soft">التقدّم</span>
-                      <span className="font-mono text-xs tabular-nums text-ink-soft">
-                        {subject.progress.percent}%
-                      </span>
-                    </div>
-                    <ProgressBar percent={subject.progress.percent} tone="violet" />
+                <Card hover className="flex h-full items-center gap-4 p-5">
+                  <ProgressRing
+                    percent={subject.progress.percent}
+                    size={62}
+                    stroke={7}
+                    className="text-violet"
+                  />
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-ink">{subject.name}</p>
+                    <p className="mt-1 text-xs text-muted">{subject.lectureCount} محاضرة</p>
+                    <p className="mt-1 text-xs text-ink-soft">
+                      {subject.progress.completed} من {subject.progress.total} مكتملة
+                    </p>
                   </div>
                 </Card>
               </Link>

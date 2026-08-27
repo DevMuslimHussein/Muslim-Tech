@@ -234,3 +234,36 @@ body {
     animation: none;
   }
 }
+
+/*
+  Glass + mesh additions.
+  Kept separate from the base block so the original token set stays intact.
+*/
+:root {
+  --mt-glass: rgba(255, 255, 255, 0.72);
+  --mt-glass-rim: rgba(255, 255, 255, 0.9);
+  --mt-gradient-mesh:
+    radial-gradient(56rem 34rem at 88% -8%, rgba(45, 212, 191, 0.30), transparent 70%),
+    radial-gradient(48rem 44rem at -10% 32%, rgba(139, 131, 245, 0.26), transparent 70%),
+    radial-gradient(46rem 34rem at 62% 108%, rgba(56, 189, 248, 0.20), transparent 70%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --mt-glass: rgba(255, 255, 255, 0.045);
+    --mt-glass-rim: rgba(255, 255, 255, 0.08);
+    --mt-gradient-mesh:
+      radial-gradient(56rem 34rem at 88% -8%, rgba(45, 212, 191, 0.16), transparent 70%),
+      radial-gradient(48rem 44rem at -10% 32%, rgba(139, 131, 245, 0.14), transparent 70%),
+      radial-gradient(46rem 34rem at 62% 108%, rgba(56, 189, 248, 0.10), transparent 70%);
+  }
+}
+
+:root[data-theme="dark"] {
+  --mt-glass: rgba(255, 255, 255, 0.045);
+  --mt-glass-rim: rgba(255, 255, 255, 0.08);
+  --mt-gradient-mesh:
+    radial-gradient(56rem 34rem at 88% -8%, rgba(45, 212, 191, 0.16), transparent 70%),
+    radial-gradient(48rem 44rem at -10% 32%, rgba(139, 131, 245, 0.14), transparent 70%),
+    radial-gradient(46rem 34rem at 62% 108%, rgba(56, 189, 248, 0.10), transparent 70%);
+}

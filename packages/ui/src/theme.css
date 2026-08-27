@@ -61,3 +61,18 @@
 @utility bg-gradient-violet {
   background-image: var(--mt-gradient-violet);
 }
+
+/*
+  Frosted-glass surface used by the student shell: a translucent card that
+  lets the page's gradient mesh show through, with a light rim rather than a
+  hard border. Falls back to a solid surface where backdrop-filter is missing.
+*/
+@utility bg-glass {
+  background-color: var(--mt-glass);
+  border-color: var(--mt-glass-rim);
+  backdrop-filter: blur(16px) saturate(1.4);
+}
+
+@utility bg-mesh {
+  background-image: var(--mt-gradient-mesh);
+}
