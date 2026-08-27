@@ -30,6 +30,7 @@ export function AccountSettings({ profile }: { profile: Profile }) {
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordStatus, setPasswordStatus] = useState<Status>({ kind: "idle" });
   const [isSavingPassword, setIsSavingPassword] = useState(false);
 
@@ -72,6 +73,12 @@ export function AccountSettings({ profile }: { profile: Profile }) {
 
   async function changePassword(event: FormEvent) {
     event.preventDefault();
+    // Without this check a single typo would lock the account out for good:
+    // the new password is stored as typed and nobody knows what it was.
+    if (newPassword !== confirmPassword) {
+      setPasswordStatus({ kind: "error", message: "كلمتا المرور غير متطابقتين" });
+      return;
+    }
     setPasswordStatus({ kind: "idle" });
     setIsSavingPassword(true);
 
@@ -90,11 +97,15 @@ export function AccountSettings({ profile }: { profile: Profile }) {
 
     setCurrentPassword("");
     setNewPassword("");
+    setConfirmPassword("");
     setPasswordStatus({
       kind: "ok",
       message: "تم تغيير كلمة المرور — سيُطلب تسجيل الدخول من جديد على الأجهزة الأخرى",
     });
   }
+
+  const mismatch =
+    confirmPassword.length > 0 && newPassword !== confirmPassword;
 
   return (
     <div className="grid max-w-4xl gap-5 lg:grid-cols-2">
@@ -180,6 +191,23 @@ export function AccountSettings({ profile }: { profile: Profile }) {
               onChange={(e) => setNewPassword(e.target.value)}
             />
           </Field>
+
+          <Field label="تأكيد كلمة المرور الجديدة">
+            <Input
+              required
+              type="password"
+              autoComplete="new-password"
+              minLength={8}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          </Field>
+
+          {mismatch && (
+            <p role="alert" className="rounded-md bg-danger-soft px-3.5 py-2.5 text-sm text-danger">
+              كلمتا المرور غير متطابقتين
+            </p>
+          )}
 
           {passwordStatus.kind !== "idle" && (
             <p
