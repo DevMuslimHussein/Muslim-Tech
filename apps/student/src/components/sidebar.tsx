@@ -14,6 +14,7 @@ import {
   IconExam,
   IconAward,
   IconCode,
+  IconChip,
 } from "./icons";
 
 const UNREAD_POLL_MS = 20_000;
@@ -23,6 +24,7 @@ const links = [
   { href: "/subjects", label: "المواد", Icon: IconBook },
   { href: "/notes", label: "ملاحظاتي", Icon: IconNote },
   { href: "/lab", label: "مختبر الأكواد", Icon: IconCode },
+  { href: "/arduino", label: "مختبر أردوينو", Icon: IconChip },
   { href: "/exams", label: "الامتحانات", Icon: IconExam },
   { href: "/grades", label: "درجاتي", Icon: IconAward },
   { href: "/bookmarks", label: "المحفوظات", Icon: IconLayers },
